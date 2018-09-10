@@ -35,12 +35,13 @@
         </li>
       </ul>
     </div>
+    <shop-cart :delivery-price="seller.deliveryPrice" :min-price="seller.minPrice"></shop-cart>
   </div>
 </template>
 
 <script type="text/ecmascript-6">
 import BScroll from "better-scroll";
-
+import ShopCart from "@/components/ShopCart.vue";
 const ERR_OK = 0;
 
 export default {
@@ -48,7 +49,10 @@ export default {
 		seller: {
 			type: Object
 		}
-	},
+  },
+  components: {
+    ShopCart
+  },
 	data() {
 		return {
 			goods: [],

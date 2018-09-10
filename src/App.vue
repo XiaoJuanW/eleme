@@ -12,7 +12,8 @@
         <router-link to="/seller">商家</router-link>
       </div>
     </div>
-    <router-view></router-view>
+    <!-- seller需要在这里传给Goods组件，Goods组件才能继续向下传递 -->
+    <router-view :seller="seller"></router-view>
   </div>
 </template>
 
@@ -41,7 +42,6 @@ export default {
 
 <style lang="stylus">
 @import url('common/css/reset.styl');
-
 border-1px($color) {
   position: relative;
 
