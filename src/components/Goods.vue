@@ -38,7 +38,7 @@
         </li>
       </ul>
     </div>
-    <shop-cart :delivery-price="seller.deliveryPrice" :min-price="seller.minPrice"></shop-cart>
+    <shop-cart :select-foods="selectFoods" :delivery-price="seller.deliveryPrice" :min-price="seller.minPrice"></shop-cart>
   </div>
 </template>
 
@@ -75,7 +75,18 @@ export default {
 				}
 			}
 			return 0;
-		}
+    },
+    selectFoods() {
+      let foods = [];
+      this.goods.forEach((good) => {
+        good.foods.forEach((food) => {
+          if(food.count) {
+            foods.push(food);
+          }
+        });
+      });
+      return foods;
+    }
 	},
 	created() {
 		this.classMap = ["decrease", "discount", "special", "invoice", "guarantee"];
@@ -108,7 +119,7 @@ export default {
 			});
 
 			this.foodsScroll = new BScroll(this.$refs.foodsWrapper, {
-				click: true,
+				click: true,  // cartControl组件中有addCart Click事件，需要在这里打开
 				probeType: 3
 			});
 

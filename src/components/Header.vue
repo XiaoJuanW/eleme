@@ -19,13 +19,13 @@
       </div>
       <div v-if="seller.supports" class="support-count" @click="showDetail()">
         <span class="count">{{seller.supports.length}}个</span>
-        <i class="icon-keyboard_arrow_right"></i>
+        <i class="fa fa-angle-right"></i>
       </div>
     </div>
     <div class="bulletin-wrapper" @click="showDetail()">
       <span class="bulletin-title"></span>
       <span class="bulletin-text">{{seller.bulletin}}</span>
-      <i class="icon-keyboard_arrow_right"></i>
+      <i class="fa fa-angle-right"></i>
     </div>
     <div class="background">
       <img :src="seller.avatar" width="100%" height="100%">
@@ -60,7 +60,7 @@
           </div>
         </div>
         <div class="detail-close" @click="hideDetail()">
-          <i class="icon-close"></i>
+          <i class="fa fa-close"></i>
         </div>
       </div>
     </transition>
@@ -99,7 +99,6 @@ export default {
 </script>
 
 <style lang="stylus" rel="stylesheet/stylus">
-// @import url('../common/css/icon.styl');
 @import url('../common/css/base.styl');
 
 bg-image($url) {
@@ -211,7 +210,7 @@ bg-image($url) {
         font-size: 10px;
       }
 
-      .icon-keyboard_arrow_right {
+      .fa-angle-right{
         margin-left: 2px;
         line-height: 24px;
         font-size: 10px;
@@ -246,7 +245,7 @@ bg-image($url) {
       font-size: 10px;
     }
 
-    .icon-keyboard_arrow_right {
+    .fa-angle-right {
       position: absolute;
       font-size: 10px;
       right: 12px;

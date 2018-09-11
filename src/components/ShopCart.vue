@@ -4,7 +4,7 @@
       <div class="content-left">
         <div class="logo-wrapper">
           <div class="logo" :class="{highlight: totalPrice > 0}">
-            <i class="icon-shopping_cart" :class="{highlight: totalPrice > 0}"></i>
+            <i class="fa fa-shopping-cart" :class="{highlight: totalPrice > 0}"></i>
           </div>
           <div v-show="totalCount > 0" class="num">{{totalCount}}</div>
         </div>
@@ -119,7 +119,7 @@ export default {
             background: rgb(0, 160, 220);
           }
 
-          .icon-shopping_cart {
+          .fa-shopping-cart {
             line-height: 44px;
             font-size: 24px;
             color: #80858a;
