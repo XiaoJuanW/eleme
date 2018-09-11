@@ -15,6 +15,14 @@
         <div class="pay" :class="payClass">{{payDesc}}</div>
       </div>
     </div>
+    <div class="ball-container" v-for="ball in balls">
+      <transition name="drop" v-on:before-enter="beforeDrop" v-on:enter="dropping" v-on:after-enter="afterDrop">
+        <div class="ball" v-show="ball.show">
+          <div class="inner inner-hook">
+          </div>
+        </div>
+      </transition>
+    </div>
   </div>
 </template>
 <script>
@@ -39,6 +47,30 @@ export default {
 			tytype: Object,
 			default: 0
 		}
+	},
+	data() {
+		return {
+			//维护每个小球的状态,因为transition只对v-if  v-show  v-for有过渡效果
+			//所以这里定义了show，在<template>中采用v-show指令
+			balls: [
+				{
+					show: false
+				},
+				{
+					show: false
+				},
+				{
+					show: false
+				},
+				{
+					show: false
+				},
+				{
+					show: false
+				}
+			],
+			dropBalls: [] // 下落小球数组
+		};
 	},
 	computed: {
 		totalPrice() {
@@ -65,19 +97,78 @@ export default {
 			} else {
 				return "去结算";
 			}
-    },
-    payClass() {
-      if(this.totalPrice >= this.minPrice) {
-        return 'enough';
-      }else {
-        return 'bot-enough';
-      }
-    }
+		},
+		payClass() {
+			if (this.totalPrice >= this.minPrice) {
+				return "enough";
+			} else {
+				return "bot-enough";
+			}
+		}
+	},
+	methods: {
+		// 掉落方法
+		drop(el) {
+			// console.log(el);
+			//对球进行遍历
+			let len = this.balls.length;
+			for (let i = 0; i < len; i++) {
+				let ball = this.balls[i];
+				if (!ball.show) {
+					ball.show = true;
+					ball.el = el;
+					this.dropBalls.push(ball); //将下落的小球放进来
+					return;
+				}
+			}
+		},
+		beforeDrop(el) {
+			//将所有设为true的小球找到
+			// 遍历所有的小球
+			let count = this.balls.length;
+			while (count--) {
+				let ball = this.balls[count];
+				if (ball.show) {
+					//返回元素的大小及其相对于视口的位置的对象
+					let rect = ball.el.getBoundingClientRect();
+					//水平和竖直方向的偏移量
+					let x = rect.left - 52; //左下角购物车和右侧点击的“+”的水平距离
+					let y = -(window.innerHeight - rect.top - 52); //竖直方向的距离差
+					//外层做一个纵向的变化
+					el.style.display = "";
+					el.style.webkitTransform = `translate3d(0,${y}px,0)`;
+					el.style.transform = `translate3d(0,${y}px,0)`;
+					//内层做一个横向的变化
+					let inner = el.getElementsByClassName("inner-hook")[0]; //取到的是一个数组，所以要取第一个元素
+					inner.style.webkitTransform = `translate3d(${x}px,0,0)`;
+					inner.style.transform = `translate3d(${x}px,0,0)`;
+				}
+			}
+		},
+		dropping(el, done) {
+			let rf = el.offsetHeight;
+			this.$nextTick(() => {
+				//当下降的时候，重写外部和内部的translate3d()
+				el.style.webkitTransform = "translate3d(0,0,0)";
+				el.style.transform = "translate3d(0,0,0)";
+				let inner = el.getElementsByClassName("inner-hook")[0]; //取到的是一个数组，所以要取第一个元素
+				inner.style.webkitTransform = "translate3d(0,0,0)";
+				inner.style.transform = "translate3d(0,0,0)";
+				el.addEventListener("transitionend", done);
+			});
+		},
+		afterDrop(el) {
+			//当降落完一个ball，就将该ball从balls数组中取出来
+			let ball = this.dropBalls.shift();
+			if (ball) {
+				ball.show = false;
+				el.style.display = "none";
+			}
+		}
 	}
 };
 </script>
 <style lang="stylus">
-
 .shopcart {
   position: fixed;
   left: 0;
@@ -193,6 +284,25 @@ export default {
           background: #00b43c;
           color: #fff;
         }
+      }
+    }
+  }
+
+  .ball-container {
+    .ball {
+      position: fixed;
+      left: 64px;
+      bottom: 44px;
+      z-index: 200;
+      // y轴 贝塞尔曲线
+      transition: all 0.4s cubic-bezier(0.49, -0.29, 0.75, 0.41);
+
+      .inner {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background: rgb(0, 160, 220);
+        transition: all 0.4s linear; // x轴只需要线性缓动
       }
     }
   }

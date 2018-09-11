@@ -30,7 +30,8 @@
                   <span class="old" v-show="food.oldPrice">￥{{food.oldPrice}}</span>
                 </div>
                 <div class="cartcontrol-wrapper">
-                  <cart-control :food="food"></cart-control>
+                  <!-- 监听v-on:cart-add="cartAdd"，购物车组件(子组件)如果提交了'cart-add'事件就调用这个cartAdd函数 -->
+                  <cart-control :food="food" v-on:cart-add="cartAdd"></cart-control>
                 </div>
               </div>
             </li>
@@ -38,7 +39,7 @@
         </li>
       </ul>
     </div>
-    <shop-cart :select-foods="selectFoods" :delivery-price="seller.deliveryPrice" :min-price="seller.minPrice"></shop-cart>
+    <shop-cart ref="shopcart" :select-foods="selectFoods" :delivery-price="seller.deliveryPrice" :min-price="seller.minPrice"></shop-cart>
   </div>
 </template>
 
@@ -75,18 +76,18 @@ export default {
 				}
 			}
 			return 0;
-    },
-    selectFoods() {
-      let foods = [];
-      this.goods.forEach((good) => {
-        good.foods.forEach((food) => {
-          if(food.count) {
-            foods.push(food);
-          }
-        });
-      });
-      return foods;
-    }
+		},
+		selectFoods() {
+			let foods = [];
+			this.goods.forEach(good => {
+				good.foods.forEach(food => {
+					if (food.count) {
+						foods.push(food);
+					}
+				});
+			});
+			return foods;
+		}
 	},
 	created() {
 		this.classMap = ["decrease", "discount", "special", "invoice", "guarantee"];
@@ -119,7 +120,7 @@ export default {
 			});
 
 			this.foodsScroll = new BScroll(this.$refs.foodsWrapper, {
-				click: true,  // cartControl组件中有addCart Click事件，需要在这里打开
+				click: true, // cartControl组件中有addCart Click事件，需要在这里打开
 				probeType: 3
 			});
 
@@ -128,6 +129,7 @@ export default {
 			});
 		},
 		_calculateHeight() {
+			// 访问DOM
 			let foodList = this.$refs.foodsWrapper.getElementsByClassName(
 				"food-list-hook"
 			);
@@ -138,6 +140,17 @@ export default {
 				height += item.clientHeight;
 				this.listHeight.push(height);
 			}
+		},
+		cartAdd(el) {
+			//调用 shopcart,给这个组件定义一个小球下落的函数
+			//然后在shopCart.vue文件里面定义drop()函数，描写一个小球下落的动作
+			//通过this.$refs.shopcart拿到子组件，然后就可以调用子组件里面定义的方法
+			// 放在nextTick里，为了体验优化，异步执行下落动画
+			// dom元素更新后执行， 因此此处能正确打印出更改之后的值；
+			this.$nextTick(() => {
+				// shopcart组件需要  ref="shopcart"
+				this.$refs["shopcart"].drop(el); //调用shopcart组件的drop()函数
+			});
 		}
 	}
 };
