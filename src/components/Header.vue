@@ -99,7 +99,7 @@ export default {
 </script>
 
 <style lang="stylus" rel="stylesheet/stylus">
-@import url('../common/css/icon.styl');
+// @import url('../common/css/icon.styl');
 @import url('../common/css/base.styl');
 
 bg-image($url) {

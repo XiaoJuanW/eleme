@@ -3,7 +3,6 @@ import Router from 'vue-router'
 import Goods from '@/components/Goods';
 import Ratings from '@/components/Ratings';
 import Seller from '@/components/Seller';
-
 Vue.use(Router)
 
 export default new Router({

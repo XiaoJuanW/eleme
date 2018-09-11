@@ -42,6 +42,8 @@ export default {
 
 <style lang="stylus">
 @import url('common/css/reset.styl');
+@import url('common/css/icon.styl');
+
 border-1px($color) {
   position: relative;
 

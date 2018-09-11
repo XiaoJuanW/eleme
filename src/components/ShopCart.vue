@@ -77,7 +77,6 @@ export default {
 };
 </script>
 <style lang="stylus">
-@import url('../common/css/icon.styl');
 
 .shopcart {
   position: fixed;
