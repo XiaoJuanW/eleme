@@ -302,7 +302,7 @@ export default {
         height: 20px;
         border-radius: 50%;
         background: rgb(0, 160, 220);
-        transition: all 0.4s linear;  // x轴只需要线性缓动
+        transition: all 0.4s linear; // x轴只需要线性缓动
       }
     }
   } 
