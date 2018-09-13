@@ -14,7 +14,7 @@
         <li v-for="item in goods" class="food-list food-list-hook">
           <h1 class="title">{{item.name}}</h1>
           <ul>
-            <li v-for="food in item.foods" class="food-item border-1px">
+            <li v-for="food in item.foods" @click="selectFood(food, $event)" class="food-item border-1px">
               <div class="icon">
                 <img width="57" height="57" :src="food.icon">
               </div>
@@ -40,6 +40,7 @@
       </ul>
     </div>
     <shop-cart ref="shopcart" :select-foods="selectFoods" :delivery-price="seller.deliveryPrice" :min-price="seller.minPrice"></shop-cart>
+    <food ref="food" :food="selectedFood" class="food"></food>
   </div>
 </template>
 
@@ -47,6 +48,8 @@
 import BScroll from "better-scroll";
 import ShopCart from "@/components/ShopCart.vue";
 import CartControl from "@/components/CartControl.vue";
+import Food from "@/components/Food.vue";
+
 const ERR_OK = 0;
 
 export default {
@@ -56,14 +59,17 @@ export default {
 		}
 	},
 	components: {
+		// 注册
 		ShopCart,
-		CartControl
+		CartControl,
+		Food
 	},
 	data() {
 		return {
 			goods: [],
 			listHeight: [],
-			scrollY: 0
+			scrollY: 0,
+			selectedFood: {}
 		};
 	},
 	computed: {
@@ -142,15 +148,19 @@ export default {
 			}
 		},
 		cartAdd(el) {
-			//调用 shopcart,给这个组件定义一个小球下落的函数
-			//然后在shopCart.vue文件里面定义drop()函数，描写一个小球下落的动作
-			//通过this.$refs.shopcart拿到子组件，然后就可以调用子组件里面定义的方法
+			// 调用 shopcart,给这个组件定义一个小球下落的函数
+			// 然后在shopCart.vue文件里面定义drop()函数，描写一个小球下落的动作
+			// 通过this.$refs.shopcart拿到子组件，然后就可以调用子组件里面定义的方法
 			// 放在nextTick里，为了体验优化，异步执行下落动画
 			// dom元素更新后执行， 因此此处能正确打印出更改之后的值；
 			this.$nextTick(() => {
 				// shopcart组件需要  ref="shopcart"
 				this.$refs["shopcart"].drop(el); //调用shopcart组件的drop()函数
 			});
+		},
+		selectFood(food, event) {
+			this.selectedFood = food;
+			this.$refs.food.show();
 		}
 	}
 };
