@@ -34,7 +34,8 @@
         <div class="rating">
           <h1 class="title">商品评价</h1>
         </div>
-        <rating-select :selectType="this.selectType" :only-content="this.onlyContent" :desc="this.desc" :ratings="food.ratings"></rating-select>
+        <!-- 绑定ref拿到子组件 -->
+        <rating-select ref="ratingType" v-on:content-toggle="contentToggle" v-on:ratingtype-select="ratingTypeSelecy" :selectType="this.selectType" :only-content="this.onlyContent" :desc="this.desc" :ratings="food.ratings"></rating-select>
       </div>
     </div>
   </transition>
@@ -97,7 +98,14 @@ export default {
 			// 提交'cart-add'事情给父组件，第二个是要传递的参数
 			this.$emit("cart-add", event.target);
 			Vue.set(this.food, "count", 1);
-		}
+    },
+    ratingTypeSelecy() {
+      // 拿到子组件，并且拿到它的data
+      console.log(this.$refs['ratingType'].currentType);
+    },
+    contentToggle() {
+      console.log(this.$refs['ratingType'].currentOnlyContent);
+    }
 	}
 };
 </script>

@@ -1,17 +1,17 @@
 <template>
   <div class="ratingselect">
     <div class="rating-type">
-      <span class="block positive" :class="{'active': selectType === 2}">{{desc.all}}
-        <span class="count">1{{ratings.length}}</span>
+      <span @click="select(2, $event)" class="block positive" :class="{'active': currentType === 2}">{{desc.all}}
+        <span class="count">{{ratings.length}}</span>
       </span>
-      <span class="block positive" :class="{'active': selectType === 0}">{{desc.positive}}
-        <span class="count">2{{ratings.length}}</span>
+      <span @click="select(0, $event)" class="block positive" :class="{'active': currentType === 0}">{{desc.positive}}
+        <span class="count">{{positives.length}}</span>
       </span>
-      <span class="block negative" :class="{'active': selectType === 1}">{{desc.negative}}
-        <span class="count">3{{ratings.length}}</span>
+      <span @click="select(1, $event)" class="block negative" :class="{'active': currentType === 1}">{{desc.negative}}
+        <span class="count">{{negatives.length}}</span>
       </span>
     </div>
-    <div class="switch" :class="{'on': onlyContent}">
+    <div @click="toggleContent($event)" class="switch" :class="{'on': currentOnlyContent}">
       <span class="icon fa fa-check-circle"></span>
       <span class="text">只看有内容的评价</span>
     </div>
@@ -50,8 +50,37 @@ export default {
 		}
 	},
 	data() {
-		return {};
-	}
+		return {
+      // vue 2.0不允许子组件修改父组件传来的props，用一个data接收
+      currentType: this.selectType,
+      currentOnlyContent: this.onlyContent
+    };
+  },
+  computed: {
+    positives() {
+      return this.ratings.filter((rating) => {
+        // 筛选出符合条件的数据
+        return rating.type === POSITIVE;
+      });
+    },
+    negatives() {
+      return this.ratings.filter((rating) => {
+        // 筛选出符合条件的数据
+        return rating.type === NEGATIVE;
+      });
+    }
+  },
+  methods: {
+    select(type, event) {
+      this.currentType = type;
+      // 告诉父组件type的变化
+      this.$emit('ratingtype-select', type);
+    },
+    toggleContent() {
+      this.currentOnlyContent = !this.currentOnlyContent;
+      this.$emit('content-toggle', this.currentOnlyContent);
+    }
+  }
 };
 </script>
 <style lang="stylus">
