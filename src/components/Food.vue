@@ -33,9 +33,25 @@
         <split></split>
         <div class="rating">
           <h1 class="title">商品评价</h1>
+          <!-- 绑定ref拿到子组件 -->
+          <rating-select ref="ratingType" v-on:content-toggle="contentToggle" v-on:ratingtype-select="ratingTypeSelecy" :selectType="this.selectType" :only-content="this.onlyContent" :desc="this.desc" :ratings="food.ratings"></rating-select>
+          <div class="rating-wrapper">
+            <ul v-show="food.ratings && food.ratings.length">
+              <li v-show="ratingShow(rating)" v-for="rating in food.ratings" class="rating-item">
+                <div class="user">
+                  <span class="name">{{rating.username}}</span>
+                  <img class="avatar" :src="rating.avatar" width="12" height="12">
+                </div>
+                <div class="time">{{rating.rateTime | formatDate}}</div>
+                <p class="text">
+                  <span :class="{'fa fa-thumbs-up': rating.rateType === 0, 'fa fa-thumbs-down': rating.rateType === 1}"></span>
+                  {{rating.text}}
+                </p>
+              </li>
+            </ul>
+            <div v-show="!food.ratings || !food.ratings.length" class="no-rating">暂无评价</div>
+          </div>
         </div>
-        <!-- 绑定ref拿到子组件 -->
-        <rating-select ref="ratingType" v-on:content-toggle="contentToggle" v-on:ratingtype-select="ratingTypeSelecy" :selectType="this.selectType" :only-content="this.onlyContent" :desc="this.desc" :ratings="food.ratings"></rating-select>
       </div>
     </div>
   </transition>
@@ -46,9 +62,7 @@ import BScroll from "better-scroll";
 import CartControl from "@/components/CartControl.vue";
 import Split from "@/components/Split.vue";
 import RatingSelect from "@/components/RatingSelect.vue";
-
-const POSITIVE = 0;
-const NEGATIVE = 1;
+import {formatDate} from "@/common/js/Date.js";
 const ALL = 2;
 
 export default {
@@ -98,15 +112,32 @@ export default {
 			// 提交'cart-add'事情给父组件，第二个是要传递的参数
 			this.$emit("cart-add", event.target);
 			Vue.set(this.food, "count", 1);
-    },
-    ratingTypeSelecy() {
-      // 拿到子组件，并且拿到它的data
-      console.log(this.$refs['ratingType'].currentType);
-    },
-    contentToggle() {
-      console.log(this.$refs['ratingType'].currentOnlyContent);
+		},
+		ratingTypeSelecy() {
+			// 拿到子组件，并且拿到它的data
+      this.selectType = this.$refs["ratingType"].currentType;
+      console.log(this.food.ratings);
+		},
+		contentToggle() {
+			this.onlyContent = this.$refs["ratingType"].currentOnlyContent;
+		},
+		ratingShow(rating) {
+			if (this.onlyContent && !rating.text) {
+				return false;
+			}
+			if (this.selectType === ALL) {
+				return true;
+			} else {
+				return this.selectType === rating.rateType;
+			}
+		}
+  },
+  filters: {
+    formatDate(time) {
+      let date = new Date(time);
+      return formatDate(date, 'yyyy-MM-dd hh:mm');
     }
-	}
+  }
 };
 </script>
 <style lang="stylus">
@@ -259,6 +290,69 @@ export default {
       margin-left: 18px;
       font-size: 14px;
       color: rgb(7, 17, 27);
+    }
+
+    .rating-wrapper {
+      padding: 0 18px;
+
+      .rating-item {
+        position: relative;
+        padding: 16px 0;
+        border-bottom: 1px solid rgba(7, 17, 27, 0.1);
+
+        .user {
+          position: absolute;
+          right: 0;
+          top: 16px;
+          line-height: 12px;
+          font-size: 0;
+
+          .name {
+            display: inline-block;
+            margin-right: 6px;
+            vertical-align: top;
+            font-size: 10px;
+            color: rgb(147, 153, 159);
+          }
+
+          .avatar {
+            border-radius: 50%;
+          }
+        }
+
+        .time {
+          margin-bottom: 6px;
+          line-height: 12px;
+          font-size: 10px;
+          color: rgb(147, 153, 159);
+        }
+
+        .text {
+          line-height: 16px;
+          font-size: 12px;
+          color: rgb(7, 17, 27);
+
+          .fa-thumbs-up, .fa-thumbs-down {
+            line-height: 16px;
+            margin-right: 4px;
+            font-size: 12px;
+          }
+
+          .fa-thumbs-up {
+            color: rgb(0, 160, 220);
+          }
+
+          .fa-thumbs-down {
+            color: rgb(147, 153, 159);
+          }
+        }
+      }
+
+      .no-rating {
+        padding: 16px 0;
+        font-size: 12px;
+        color: rgb(147, 153, 159);
+      }
     }
   }
 }
