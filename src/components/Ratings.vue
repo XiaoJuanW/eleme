@@ -24,12 +24,39 @@
           </div>
         </div>
       </div>
+      <split></split>
+      <rating-select :selectType="selectType" :only-content="onlyContent" :ratings="ratings"></rating-select>
+      <div class="rating-wrapper">
+        <ul>
+          <li v-for="rating in ratings">
+            <div class="rating-left">
+              <img :src="rating.avatar" width="28" height="28">
+            </div>
+            <div class="rating-rigt">
+              <div class="top">
+                <div class="name">{{rating.username}}</div>
+                <div class="time">{{rating.rateTime | formatDate}}</div>
+              </div>
+              <div class="score">
+                <star :size="24" :score="rating.score"></star>
+                <span class="deliveryTime">{{rating.deliveryTime}}分钟送达</span>
+              </div>
+              <p class="text"></p>
+              <div class="recommend"></div>
+            </div>
+          </li>
+        </ul>
+      </div>
     </div>
   </div>
 </template>
 <script>
 import BScroll from "better-scroll";
 import Star from "@/components/Star.vue";
+import Split from "@/components/Split.vue";
+import RatingSelect from "@/components/RatingSelect.vue";
+import {formatDate} from "@/common/js/Date.js";
+const ALL = 2;
 export default {
 	props: {
 		seller: {
@@ -37,11 +64,30 @@ export default {
 		}
 	},
 	data() {
-		return {};
+		return {
+      ratings: [],
+			selectType: ALL,
+			onlyContent: true,
+    };
 	},
 	components: {
-		Star
-	}
+    Star,
+    Split,
+    RatingSelect
+  },
+  filters: {
+    formatDate(time) {
+      let date = new Date(time);
+      return formatDate(date, 'yyyy-MM-dd hh:mm');
+    }
+  },
+  created() {
+    this.$http.get('/api/ratings').then(response => {
+      if(response.body.errno === 0) {
+        this.ratings = response.body.data;
+      }
+    });
+  }
 };
 </script>
 <style lang="stylus">

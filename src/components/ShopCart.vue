@@ -13,7 +13,7 @@
           <div class="desc">¥另需配送费{{deliveryPrice}}元</div>
         </div>
         <!-- 阻止事件冒泡+提交事件不再重载页面 -->
-        <div class="content-right" @click.stop.prevent="pay()">
+        <div class="content-right" @click.stop="pay()">
           <div class="pay" :class="payClass">{{payDesc}}</div>
         </div>
       </div>

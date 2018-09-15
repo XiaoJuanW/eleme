@@ -30,8 +30,7 @@
                   <span class="old" v-show="food.oldPrice">￥{{food.oldPrice}}</span>
                 </div>
                 <div class="cartcontrol-wrapper">
-                  <!-- 监听v-on:cart-add="cartAdd"，购物车组件(子组件)如果提交了'cart-add'事件就调用这个cartAdd函数 -->
-                  <cart-control :food="food" v-on:cart-add="cartAdd"></cart-control>
+                  <cart-control :food="food"></cart-control>
                 </div>
               </div>
             </li>
@@ -69,7 +68,9 @@ export default {
 			goods: [],
 			listHeight: [],
 			scrollY: 0,
-			selectedFood: {}
+			selectedFood: {
+				ratings: []
+			}
 		};
 	},
 	computed: {
@@ -108,7 +109,12 @@ export default {
 				});
 			}
 		});
-	},
+		//  监听cart-add，事件回调方法
+		this.$eventHub.$on("cart-add", this.cartAdd);
+  },
+  beforeDestroy() {
+    this.$eventHub.$off("cart-add", this.cartAdd);
+  },
 	methods: {
 		selectMenu(index, event) {
 			// if (!event._constructed) {

@@ -9,6 +9,8 @@ import 'font-awesome/css/font-awesome.css'
 Vue.config.productionTip = false;
 Vue.use(VueResource);
 
+Vue.prototype.$eventHub = new Vue();
+
 /* eslint-disable no-new */
 new Vue({
   el: '#app',

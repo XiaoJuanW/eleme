@@ -6,7 +6,7 @@
       </div>
     </transition>
     <div class="cart-count" v-show="food.count > 0">{{food.count}}</div>
-    <div class="cart-add fa fa-plus-circle" @click.stop.prevent="addCart($event)"></div>
+    <div class="cart-add fa fa-plus-circle" @click.stop="addCart($event)"></div>
   </div>
 </template>
 <script>
@@ -28,7 +28,7 @@ export default {
 				this.food.count++;
       }
       // 提交'cart-add'事情给父组件，第二个是要传递的参数
-      this.$emit('cart-add', event.target);
+      this.$eventHub.$emit('cart-add', event.target);
 		},
 		decreaseCart() {
 			this.food.count--;
