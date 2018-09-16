@@ -1,5 +1,5 @@
 <template>
-  <div class="ratings">
+  <div class="ratings" ref="ratingsWrapper">
     <div class="ratings-content">
       <div class="overview">
         <div class="overview-left">
@@ -28,7 +28,7 @@
       <rating-select :selectType="selectType" :only-content="onlyContent" :ratings="ratings"></rating-select>
       <div class="rating-wrapper">
         <ul>
-          <li v-for="rating in ratings">
+          <li v-show="ratingShow(rating)" v-for="rating in ratings">
             <div class="rating-left">
               <img :src="rating.avatar" width="28" height="28">
             </div>
@@ -41,8 +41,13 @@
                 <star :size="24" :score="rating.score"></star>
                 <span class="deliveryTime">{{rating.deliveryTime}}分钟送达</span>
               </div>
-              <p class="text"></p>
-              <div class="recommend"></div>
+              <p class="text">{{rating.text}}</p>
+              <div class="recommend">
+                <span :class="{'fa fa-thumbs-up': rating.rateType === 0, 'fa fa-thumbs-down': rating.rateType === 1}"></span>
+                <div v-for="recommend in rating.recommend">
+                  {{recommend}}
+                </div>
+              </div>
             </div>
           </li>
         </ul>
@@ -55,7 +60,7 @@ import BScroll from "better-scroll";
 import Star from "@/components/Star.vue";
 import Split from "@/components/Split.vue";
 import RatingSelect from "@/components/RatingSelect.vue";
-import {formatDate} from "@/common/js/Date.js";
+import { formatDate } from "@/common/js/Date.js";
 const ALL = 2;
 export default {
 	props: {
@@ -65,29 +70,62 @@ export default {
 	},
 	data() {
 		return {
-      ratings: [],
+			ratings: [],
 			selectType: ALL,
-			onlyContent: true,
-    };
+			onlyContent: true
+		};
 	},
 	components: {
-    Star,
-    Split,
-    RatingSelect
-  },
-  filters: {
-    formatDate(time) {
-      let date = new Date(time);
-      return formatDate(date, 'yyyy-MM-dd hh:mm');
-    }
-  },
-  created() {
-    this.$http.get('/api/ratings').then(response => {
-      if(response.body.errno === 0) {
-        this.ratings = response.body.data;
-      }
-    });
-  }
+		Star,
+		Split,
+		RatingSelect
+	},
+	filters: {
+		formatDate(time) {
+			let date = new Date(time);
+			return formatDate(date, "yyyy-MM-dd hh:mm");
+		}
+	},
+	methods: {
+		_initScroll() {
+			this.scroll = new BScroll(this.$refs.ratingsWrapper, {
+				click: true
+			});
+    },
+    ratingShow(rating) {
+			if (this.onlyContent && !rating.text) {
+				return false;
+			}
+			if (this.selectType === ALL) {
+				return true;
+			} else {
+				return this.selectType === rating.rateType;
+			}
+		},
+		ratingTypeSelect(el) {
+			// 拿到子组件，并且拿到它的data
+			this.selectType = el;
+    },
+    contentToggle(el) {
+			this.onlyContent = el;
+		}
+	},
+	created() {
+		this.$http.get("/api/ratings").then(response => {
+			if (response.body.errno === 0) {
+				this.ratings = response.body.data;
+				this.$nextTick(() => {
+					this._initScroll();
+				});
+			}
+		});
+    this.$eventHub.$on("ratingtype-select", this.ratingTypeSelect);
+    this.$eventHub.$on('content-toggle', this.contentToggle);
+	},
+	beforeDestroy() {
+    this.$eventHub.$off("ratingtype-select", this.ratingTypeSelect);
+    this.$eventHub.$off('content-toggle', this.contentToggle);
+	}
 };
 </script>
 <style lang="stylus">

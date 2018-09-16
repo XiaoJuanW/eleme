@@ -60,13 +60,13 @@ export default {
     positives() {
       return this.ratings.filter((rating) => {
         // 筛选出符合条件的数据
-        return rating.type === POSITIVE;
+        return rating.rateType === POSITIVE;
       });
     },
     negatives() {
       return this.ratings.filter((rating) => {
         // 筛选出符合条件的数据
-        return rating.type === NEGATIVE;
+        return rating.rateType === NEGATIVE;
       });
     }
   },
@@ -74,11 +74,11 @@ export default {
     select(type, event) {
       this.currentType = type;
       // 告诉父组件type的变化
-      this.$emit('ratingtype-select', type);
+      this.$eventHub.$emit('ratingtype-select', type);
     },
     toggleContent() {
       this.currentOnlyContent = !this.currentOnlyContent;
-      this.$emit('content-toggle', this.currentOnlyContent);
+      this.$eventHub.$emit('content-toggle', this.currentOnlyContent);
     }
   }
 };

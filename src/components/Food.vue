@@ -34,7 +34,7 @@
         <div class="rating">
           <h1 class="title">商品评价</h1>
           <!-- 绑定ref拿到子组件 -->
-          <rating-select ref="ratingType" v-on:content-toggle="contentToggle" v-on:ratingtype-select="ratingTypeSelecy" :selectType="this.selectType" :only-content="this.onlyContent" :desc="this.desc" :ratings="food.ratings"></rating-select>
+          <rating-select :selectType="this.selectType" :only-content="this.onlyContent" :desc="this.desc" :ratings="food.ratings"></rating-select>
           <div class="rating-wrapper">
             <ul v-show="food.ratings && food.ratings.length">
               <li v-show="ratingShow(rating)" v-for="rating in food.ratings" class="rating-item">
@@ -62,7 +62,7 @@ import BScroll from "better-scroll";
 import CartControl from "@/components/CartControl.vue";
 import Split from "@/components/Split.vue";
 import RatingSelect from "@/components/RatingSelect.vue";
-import {formatDate} from "@/common/js/Date.js";
+import { formatDate } from "@/common/js/Date.js";
 const ALL = 2;
 
 export default {
@@ -113,13 +113,12 @@ export default {
 			this.$emit("cart-add", event.target);
 			Vue.set(this.food, "count", 1);
 		},
-		ratingTypeSelecy() {
+		ratingTypeSelect(type) {
 			// 拿到子组件，并且拿到它的data
-      this.selectType = this.$refs["ratingType"].currentType;
-      console.log(this.food.ratings);
+			this.selectType = type;
 		},
-		contentToggle() {
-			this.onlyContent = this.$refs["ratingType"].currentOnlyContent;
+		contentToggle(el) {
+			this.onlyContent = el;
 		},
 		ratingShow(rating) {
 			if (this.onlyContent && !rating.text) {
@@ -131,13 +130,21 @@ export default {
 				return this.selectType === rating.rateType;
 			}
 		}
-  },
-  filters: {
-    formatDate(time) {
-      let date = new Date(time);
-      return formatDate(date, 'yyyy-MM-dd hh:mm');
-    }
-  }
+	},
+	created() {
+		this.$eventHub.$on("ratingtype-select", this.ratingTypeSelect);
+		this.$eventHub.$on("content-toggle", this.contentToggle);
+	},
+	beforeDestroy() {
+		this.$eventHub.$off("ratingtype-select", this.ratingTypeSelect);
+		this.$eventHub.$off("content-toggle", this.contentToggle);
+	},
+	filters: {
+		formatDate(time) {
+			let date = new Date(time);
+			return formatDate(date, "yyyy-MM-dd hh:mm");
+		}
+	}
 };
 </script>
 <style lang="stylus">
