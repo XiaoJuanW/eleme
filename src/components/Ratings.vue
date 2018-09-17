@@ -28,25 +28,23 @@
       <rating-select :selectType="selectType" :only-content="onlyContent" :ratings="ratings"></rating-select>
       <div class="rating-wrapper">
         <ul>
-          <li v-show="ratingShow(rating)" v-for="rating in ratings">
-            <div class="rating-left">
+          <li class="rating-item" v-show="ratingShow(rating)" v-for="rating in ratings">
+            <div class="avatar">
               <img :src="rating.avatar" width="28" height="28">
             </div>
-            <div class="rating-rigt">
-              <div class="top">
-                <div class="name">{{rating.username}}</div>
-                <div class="time">{{rating.rateTime | formatDate}}</div>
+            <div class="content">
+              <div class="name">{{rating.username}}</div>
+              <div class="time">{{rating.rateTime | formatDate}}</div>
+              <div class="star-wrapper">
+                <star class="star" :size="24" :score="rating.score"></star>
+                <span v-show="rating.deliveryTime" class="deliveryTime">{{rating.deliveryTime}}分钟送达</span>
               </div>
-              <div class="score">
-                <star :size="24" :score="rating.score"></star>
-                <span class="deliveryTime">{{rating.deliveryTime}}分钟送达</span>
-              </div>
-              <p class="text">{{rating.text}}</p>
+              <p v-show="rating.text" class="text">{{rating.text}}</p>
               <div class="recommend">
                 <span :class="{'fa fa-thumbs-up': rating.rateType === 0, 'fa fa-thumbs-down': rating.rateType === 1}"></span>
-                <div v-for="recommend in rating.recommend">
-                  {{recommend}}
-                </div>
+                <span class="item" v-for="item in rating.recommend">
+                  {{item}}
+                </span>
               </div>
             </div>
           </li>
@@ -62,6 +60,7 @@ import Split from "@/components/Split.vue";
 import RatingSelect from "@/components/RatingSelect.vue";
 import { formatDate } from "@/common/js/Date.js";
 const ALL = 2;
+const ERR_OK = 0;
 export default {
 	props: {
 		seller: {
@@ -91,8 +90,8 @@ export default {
 			this.scroll = new BScroll(this.$refs.ratingsWrapper, {
 				click: true
 			});
-    },
-    ratingShow(rating) {
+		},
+		ratingShow(rating) {
 			if (this.onlyContent && !rating.text) {
 				return false;
 			}
@@ -105,26 +104,26 @@ export default {
 		ratingTypeSelect(el) {
 			// 拿到子组件，并且拿到它的data
 			this.selectType = el;
-    },
-    contentToggle(el) {
+		},
+		contentToggle(el) {
 			this.onlyContent = el;
 		}
 	},
 	created() {
 		this.$http.get("/api/ratings").then(response => {
-			if (response.body.errno === 0) {
+			if (response.body.errno === ERR_OK) {
 				this.ratings = response.body.data;
 				this.$nextTick(() => {
 					this._initScroll();
 				});
 			}
 		});
-    this.$eventHub.$on("ratingtype-select", this.ratingTypeSelect);
-    this.$eventHub.$on('content-toggle', this.contentToggle);
+		this.$eventHub.$on("ratingtype-select", this.ratingTypeSelect);
+		this.$eventHub.$on("content-toggle", this.contentToggle);
 	},
 	beforeDestroy() {
-    this.$eventHub.$off("ratingtype-select", this.ratingTypeSelect);
-    this.$eventHub.$off('content-toggle', this.contentToggle);
+		this.$eventHub.$off("ratingtype-select", this.ratingTypeSelect);
+		this.$eventHub.$off("content-toggle", this.contentToggle);
 	}
 };
 </script>
@@ -223,6 +222,100 @@ export default {
           line-height: 18px;
           font-size: 12px;
           color: rgb(147, 153, 159);
+        }
+      }
+    }
+  }
+
+  .rating-wrapper {
+    padding: 0 18px;
+
+    .rating-item {
+      display: flex;
+      padding: 18px 0;
+      border-bottom: 1px solid rgba(7, 17, 27, 0.1);
+
+      .avatar {
+        flex: 0 0 28px;
+        margin-right: 12px;
+
+        img {
+          border-radius: 50%;
+        }
+      }
+
+      .content {
+        position: relative;
+        flex: 1;
+
+        .name {
+          margin-bottom: 4px;
+          line-height: 12px;
+          font-size: 10px;
+          color: rgb(7, 17, 27);
+        }
+
+        .time {
+          position: absolute;
+          top: 0;
+          right: 0;
+          line-height: 12px;
+          font-size: 10px;
+          font-weight: 200;
+          color: rgb(147, 153, 159);
+        }
+
+        .star-wrapper {
+          margin-bottom: 6px;
+          font-size: 0;
+
+          .star {
+            display: inline-block;
+            margin-right: 6px;
+          }
+
+          .deliveryTime {
+            line-height: 12px;
+            font-size: 10px;
+            font-weight: 200;
+            color: rgb(147, 153, 159);
+          }
+        }
+
+        .text {
+          margin-bottom: 8px;
+          line-height: 18px;
+          font-size: 12px;
+          color: rgb(7, 17, 27);
+        }
+
+        .recommend {
+          line-height: 18px;
+          font-size: 0;
+
+          .fa-thumbs-up {
+            display: inline-block;
+            margin-right: 8px;
+            font-size: 12px;
+            color: rgb(0, 160, 220);
+          }
+
+          .fa-thumbs-down {
+            display: inline-block;
+            margin-right: 8px;
+            font-size: 12px;
+            color: rgb(183, 187, 197);
+          }
+
+          .item {
+            display: inline-block;
+            margin-right: 8px;
+            padding: 0 6px;
+            border-radius: 1px;
+            font-size: 9px;
+            color: rgb(147, 153, 159);
+            border: 1px solid rgba(7, 17, 27, 0.1);
+          }
         }
       }
     }
