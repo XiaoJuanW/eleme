@@ -82,7 +82,7 @@ export default {
 	data() {
 		return {
 			favorite: (() => {
-				return loadFromLocal(this.seller.id, 'favorite', false);
+				return loadFromLocal(this.seller.id, "favorite", false);
 			})()
 		};
 	},
@@ -117,13 +117,23 @@ export default {
 			}
 		}
 	},
-	created() {
-		this.classMap = ["decrease", "discount", "special", "invoice", "guarantee"];
-		this.$nextTick(() => {
-			// 不要忘记this.
+	watch: {
+		seller() {
 			this._initScroll();
 			this._initPicsScroll();
-		});
+		}
+	},
+	ready() {
+		this._initScroll();
+		this._initPicsScroll();
+	},
+	created() {
+		this.classMap = ["decrease", "discount", "special", "invoice", "guarantee"];
+		// this.$nextTick(() => {
+		// 	// 不要忘记this.
+		// 	this._initScroll();
+		// 	this._initPicsScroll();
+		// });
 	},
 	computed: {
 		favoriteText() {
