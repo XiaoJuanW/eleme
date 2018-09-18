@@ -12,8 +12,11 @@
         <router-link to="/seller">商家</router-link>
       </div>
     </div>
-    <!-- seller需要在这里传给Goods组件，Goods组件才能继续向下传递 -->
-    <router-view :seller="seller"></router-view>
+    <!-- 状态保留：把组件的状态缓存到内存里 -->
+    <keep-alive>
+      <!-- seller需要在这里传给Goods组件，Goods组件才能继续向下传递 -->
+      <router-view :seller="seller"></router-view>
+    </keep-alive>
   </div>
 </template>
 
@@ -26,12 +29,12 @@ export default {
 	data() {
 		return {
 			seller: {
-        id: (() => {
-          let queryParam = urlParse();
-          // console.log(queryParam);
-          return queryParam.id;
-        })()  // 立即执行函数
-      }
+				id: (() => {
+					let queryParam = urlParse();
+					// console.log(queryParam);
+					return queryParam.id;
+				})() // 立即执行函数
+			}
 		};
 	},
 	components: {
@@ -39,12 +42,11 @@ export default {
 	},
 	created() {
 		this.$http.get("/api/seller?id=" + this.seller.id).then(response => {
-      let res = response.body;
+			let res = response.body;
 			if (res.errno === ERR_OK) {
-        // this.seller = res.data;
-        // 三个参数：返回的结果、source、需要添加的东西
-        this.seller = Object.assign({}, this.seller, res.data);
-        console.log(this.seller.id);
+				// this.seller = res.data;
+				// 三个参数：返回的结果、source、需要添加的东西
+				this.seller = Object.assign({}, this.seller, res.data);
 			}
 		});
 	}
