@@ -28,6 +28,10 @@
             </div>
           </li>
         </ul>
+        <div class="favorite">
+          <span @click="toggleFavorite()" class="icon fa fa-heart" :class="{'active':favorite}"></span>
+          <span class="text">{{favoriteText}}</span>
+        </div>
       </div>
       <split></split>
       <div class="bulletin">
@@ -41,6 +45,23 @@
         </ul>
       </div>
       <split></split>
+      <div class="pics">
+        <h1 class="title">商家实景</h1>
+        <div class="pic-wrapper" ref="picsWrapper">
+          <ul class="pic-list" ref="picList">
+            <li class="pic-item" v-for="pic in seller.pics">
+              <img :src="pic" width="120" height="90">
+            </li>
+          </ul>
+        </div>
+      </div>
+      <split></split>
+      <div class="info">
+        <h1 class="title">商家信息</h1>
+        <ul v-if="seller.infos">
+          <li class="info-item" v-for="info in seller.infos">{{info}}</li>
+        </ul>
+      </div>
     </div>
   </div>
 </template>
@@ -57,15 +78,37 @@ export default {
 	},
 	data() {
 		return {
-			seller: {}
+			seller: {},
+			favorite: false
 		};
 	},
 	methods: {
+		toggleFavorite() {
+			this.favorite = !this.favorite;
+		},
 		_initScroll() {
 			if (!this.scroll) {
-				this.scroll = new BScroll(this.$refs.sellWrapper, {});
+				this.scroll = new BScroll(this.$refs.sellWrapper, {
+					click: true
+				});
 			} else {
 				this.scroll.refresh();
+			}
+		},
+		_initPicsScroll() {
+			if (this.seller.pics) {
+				let picWidth = 120;
+				let marginR = 6;
+				let width = (picWidth + marginR) * this.seller.pics.length - marginR;
+				this.$refs.picList.style.width = width + "px";
+				if (!this.picsScroll) {
+					this.picsScroll = new BScroll(this.$refs.picsWrapper, {
+						scrollX: true,
+						eventPassthrough: "vertical"
+					});
+				} else {
+					this.picsScroll.refresh();
+				}
 			}
 		}
 	},
@@ -76,11 +119,17 @@ export default {
 			if (res.errno === ERR_OK) {
 				this.seller = res.data;
 				this.$nextTick(() => {
-          // 不要忘记this.
+					// 不要忘记this.
 					this._initScroll();
+					this._initPicsScroll();
 				});
 			}
 		});
+	},
+	computed: {
+		favoriteText() {
+			return this.favorite ? "已收藏" : "收藏";
+		}
 	}
 };
 </script>
@@ -101,6 +150,7 @@ bg-image($url) {
   overflow: hidden;
 
   .overview {
+    position: relative;
     padding: 18px;
 
     .name {
@@ -167,6 +217,32 @@ bg-image($url) {
         }
       }
     }
+
+    .favorite {
+      position: absolute;
+      width: 50px;
+      top: 18px;
+      right: 11px;
+      text-align: center;
+
+      .icon {
+        display: block;
+        margin-bottom: 4px;
+        line-height: 20px;
+        font-size: 20px;
+        color: #d4d6d9;
+
+        &.active {
+          color: rgb(240, 20, 20);
+        }
+      }
+
+      .text {
+        line-height: 10px;
+        font-size: 10px;
+        color: rgb(77, 85, 93);
+      }
+    }
   }
 
   .bulletin {
@@ -229,6 +305,54 @@ bg-image($url) {
           color: rgb(7, 17, 27);
         }
       }
+    }
+  }
+
+  .pics {
+    padding: 18px;
+
+    .title {
+      margin-bottom: 12px;
+      font-size: 14px;
+      color: rgb(7, 17, 27);
+    }
+
+    .pic-wrapper {
+      width: 100%;
+      overflow: hidden;
+      white-space: nowrap;
+
+      .pic-list {
+        font-size: 0;
+
+        .pic-item {
+          display: inline-block;
+          margin-right: 6px;
+
+          &:last-child {
+            margin-right: 0;
+          }
+        }
+      }
+    }
+  }
+
+  .info {
+    padding: 18px 18px 0 18px;
+
+    .title {
+      margin-bottom: 12px;
+      font-size: 14px;
+      color: rgb(7, 17, 27);
+    }
+
+    .info-item {
+      padding: 16px 12px;
+      line-height: 16px; // 字数太多折行的话中间有间隙
+      font-size: 12px;
+      font-weight: 200;
+      color: rgb(7, 17, 27);
+      border-top: 1px solid rgba(7, 17, 27, 0.1);
     }
   }
 }
