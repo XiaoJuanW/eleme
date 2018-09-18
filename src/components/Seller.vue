@@ -69,22 +69,27 @@
 import BScroll from "better-scroll";
 import Star from "@/components/Star.vue";
 import Split from "@/components/Split.vue";
-
+import { saveToLocal, loadFromLocal } from "@/common/js/Store.js";
 const ERR_OK = 0;
 export default {
 	components: {
 		Star,
 		Split
 	},
+	props: {
+		seller: {}
+	},
 	data() {
 		return {
-			seller: {},
-			favorite: false
+			favorite: (() => {
+				return loadFromLocal(this.seller.id, 'favorite', false);
+			})()
 		};
 	},
 	methods: {
 		toggleFavorite() {
 			this.favorite = !this.favorite;
+			saveToLocal(this.seller.id, "favorite", this.favorite);
 		},
 		_initScroll() {
 			if (!this.scroll) {
@@ -114,16 +119,10 @@ export default {
 	},
 	created() {
 		this.classMap = ["decrease", "discount", "special", "invoice", "guarantee"];
-		this.$http.get("/api/seller").then(res => {
-			res = res.body;
-			if (res.errno === ERR_OK) {
-				this.seller = res.data;
-				this.$nextTick(() => {
-					// 不要忘记this.
-					this._initScroll();
-					this._initPicsScroll();
-				});
-			}
+		this.$nextTick(() => {
+			// 不要忘记this.
+			this._initScroll();
+			this._initPicsScroll();
 		});
 	},
 	computed: {
@@ -222,7 +221,7 @@ bg-image($url) {
       position: absolute;
       width: 50px;
       top: 18px;
-      right: 11px;
+      right: 11px; // 50-36（已收藏三个字宽度）=14； 14/2=7  18-7=11
       text-align: center;
 
       .icon {

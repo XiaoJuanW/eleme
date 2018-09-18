@@ -18,22 +18,33 @@
 </template>
 
 <script>
+import { urlParse } from "@/common/js/util.js";
 import Header from "@/components/Header.vue";
 const ERR_OK = 0;
 export default {
 	name: "App",
 	data() {
 		return {
-			seller: {}
+			seller: {
+        id: (() => {
+          let queryParam = urlParse();
+          // console.log(queryParam);
+          return queryParam.id;
+        })()  // 立即执行函数
+      }
 		};
 	},
 	components: {
 		"v-header": Header
 	},
 	created() {
-		this.$http.get("/api/seller").then(response => {
-			if (response.body.errno === ERR_OK) {
-				this.seller = response.body.data;
+		this.$http.get("/api/seller?id=" + this.seller.id).then(response => {
+      let res = response.body;
+			if (res.errno === ERR_OK) {
+        // this.seller = res.data;
+        // 三个参数：返回的结果、source、需要添加的东西
+        this.seller = Object.assign({}, this.seller, res.data);
+        console.log(this.seller.id);
 			}
 		});
 	}
